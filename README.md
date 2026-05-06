@@ -145,7 +145,7 @@ Available environment variables:
 | `COOP_SHIP_STATS_CORRECTION_MULTIPLIER` | empty | Optional ship co-op stat correction multiplier |
 | `COOP_SHARED_QUESTS` | empty | Optional shared co-op quests toggle |
 | `EASY_EXPLORE` | empty | Optional easy exploration mode toggle |
-| `UPDATE_ON_START` | `true` | Run SteamCMD update before each start |
+| `UPDATE_ON_START` | `true` | Run SteamCMD update before each start. The wrapper skips the pre-update install snapshot when the installed build already matches latest. |
 | `USE_DIRECT_CONNECTION` | `false` | Enable Windrose Direct IP settings |
 | `SERVER_PORT` | `7777` | Direct IP port when direct mode is enabled |
 | `DIRECT_CONNECTION_PROXY_ADDRESS` | `0.0.0.0` | Direct IP bind/proxy address |

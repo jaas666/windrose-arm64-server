@@ -188,6 +188,17 @@ manifest_build() {
   awk -F'"' '/"buildid"/{print $4; exit}' "$manifest" 2>/dev/null || true
 }
 
+latest_steam_build() {
+  /usr/local/bin/windrose-latest-build 2>/dev/null || true
+}
+
+write_steam_latest_cache() {
+  local latest="$1"
+  [ -n "$latest" ] || return 0
+  mkdir -p "$(dirname "$WINDROSE_STEAM_LATEST_CACHE")"
+  jq -n --arg latest "$latest" --argjson ts "$(date -u +%s)" '{latest_build:$latest,checked_at:$ts}' > "$WINDROSE_STEAM_LATEST_CACHE"
+}
+
 version_pin_target() {
   if [ -f "$WINDROSE_VERSION_PIN_FILE" ]; then
     sed -n 's/.*"target_build"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$WINDROSE_VERSION_PIN_FILE" | head -1
@@ -238,7 +249,7 @@ update_server_once() {
 
 update_server() {
   local attempt status
-  local pin_target current_build
+  local pin_target current_build latest_build
   pin_target="$(version_pin_target)"
   if [ "$pin_target" != "latest" ] && [ -x "$SERVER_EXEC" ]; then
     log "Steam update skipped because server is pinned to build $pin_target"
@@ -246,7 +257,13 @@ update_server() {
   fi
 
   current_build="$(manifest_build)"
-  snapshot_current_if_missing "${current_build:-unknown}"
+  latest_build="$(latest_steam_build)"
+  write_steam_latest_cache "$latest_build"
+  if [ -n "$current_build" ] && [ -n "$latest_build" ] && [ "$current_build" = "$latest_build" ]; then
+    log "Current Steam build $current_build is already latest; skipping pre-update snapshot"
+  else
+    snapshot_current_if_missing "${current_build:-unknown}"
+  fi
 
   for attempt in 1 2 3; do
     log "Installing or updating Windrose dedicated server with SteamCMD (attempt $attempt/3)"
