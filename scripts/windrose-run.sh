@@ -148,7 +148,8 @@ if [ -n "$SERVER_INVITE_CODE" ] && ! [[ "$SERVER_INVITE_CODE" =~ ^[0-9A-Za-z]{6,
 fi
 
 if is_truthy "$DISABLE_CORE_DUMPS"; then
-  ulimit -c 0 || log "Could not disable process core dumps"
+  ulimit -S -c 0 || log "Could not disable soft core dump limit"
+  ulimit -H -c 0 || log "Could not disable hard core dump limit"
 fi
 
 SERVER_EXEC="$SERVER_DIR/R5/Binaries/Win64/WindroseServer-Win64-Shipping.exe"
