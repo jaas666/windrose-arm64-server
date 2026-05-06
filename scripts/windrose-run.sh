@@ -729,12 +729,14 @@ trap 'shutdown_all; exit 143' TERM INT
 ensure_version_dir_not_nested
 mkdir -p "$WINDROSE_CONTROL_DIR" "$WINDROSE_VERSION_DIR"
 clear_control_action
+write_runtime_state "starting"
 start_panel
 
 SKIP_UPDATE_ONCE=0
 crash_retries=0
 
 while true; do
+  write_runtime_state "starting"
   prepare_server
   log "Starting Windrose dedicated server"
   write_runtime_state "running"
